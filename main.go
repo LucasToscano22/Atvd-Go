@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"errors"
+)
 
 var numeros []int
 var flag int = 0
@@ -19,6 +22,7 @@ func main() {
 		fmt.Println("4 - Ver estatisticas")
 		fmt.Println("5 - Divisão de números")
 		fmt.Println("6 - Limpar lista de números")
+		fmt.Println("7 - Listar números pares")
 		fmt.Println("0 - Encerrar")
 		fmt.Println("------------")
 		fmt.Println()
@@ -27,24 +31,33 @@ func main() {
 		fmt.Scanln(&opcao)
 
 		if opcao == 1 {
-			adicionarNumero()
+			err := adicionarNumero()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
 		}
 
 		if opcao == 2 {
-			listarNumeros()
+			err := listarNumeros()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
 		}
 
 		if opcao == 3 {
-			removerNumero()
+			err := removerNumero()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
 		}
 
 		if opcao == 4 {
-			if len(numeros) == 0 {
-				fmt.Println("Lista vazia")
+			min, max, media, err := calcularEstatisticas()
+
+			if err != nil {
+				fmt.Println("Erro:", err)
 				continue
 			}
-
-			min, max, media := calcularEstatisticas()
 
 			fmt.Println("Mínimo: ", min)
 			fmt.Println("Máximo: ", max)
@@ -52,11 +65,24 @@ func main() {
 		}
 
 		if opcao == 5 {
-			dividirNumeros()
+			err := dividirNumeros()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
+		}
+		
+		if opcao == 6 {
+			err := limparLista()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
 		}
 
-		if opcao == 6 {
-			limparLista()
+		if opcao == 7 {
+			err := listarNumerosPares()
+			if err != nil {
+				fmt.Println("Erro:", err)
+			}
 		}
 
 		if opcao == flag {
@@ -66,30 +92,35 @@ func main() {
 	}
 }
 
-func adicionarNumero() {
+func adicionarNumero() error {
 	var numero int
 	fmt.Println("Digite um número para adicionar na lista:")
 	fmt.Scanln(&numero)
+
+	if numero < 0 {
+		return errors.New("Apenas números positivos são aceitos")
+	}
 	numeros = append(numeros, numero)
+	return nil
 }
 
-func listarNumeros() {
+func listarNumeros() error {
 
 	if len(numeros) == 0 {
-		fmt.Println("Lista está vazia")
-		return
+		return errors.New("Lista está vazia")
 	}
 
 	for i := 0; i < len(numeros); i++ {
 		fmt.Println("Indice: ", i, "Valor: ", numeros[i])
 	}
+
+	return nil
 }
 
-func removerNumero() {
+func removerNumero() error {
 	
 	if len(numeros) == 0 {
-		fmt.Println("Lista está vazia")
-		return
+		return errors.New("Lista está vazia")
 	}
 
 	fmt.Println("Digite um indice para remover o elemento da lista:")
@@ -97,20 +128,20 @@ func removerNumero() {
 	fmt.Scanln(&i)
 
 	if i < 0  || i >= len(numeros) {
-		fmt.Println("Indice inválido")
-		return
+		return errors.New("Indice inválido")
 	}
 
 	numeros = append(numeros[:i], numeros[i+1:]...)
 
 	fmt.Println("Número removido da lista")
+	return nil
 }
 
-func calcularEstatisticas() (int, int, float64){
+func calcularEstatisticas() (int, int, float64, error){
 
-	// if len(numeros) == 0 {
-	// 	return 0, 0, 0
-	// }
+	if len(numeros) == 0 {
+		return 0, 0, 0, errors.New("Lista está vazia")
+	}
 
 	min := numeros[0]
 	max := numeros[0]
@@ -129,20 +160,20 @@ func calcularEstatisticas() (int, int, float64){
 
 	media := float64(soma) / float64(len(numeros))
 	
-	return min, max, media
+	return min, max, media, nil
 
 }
 
 func dividir(a int, b int) (float64, error) {
 	if b == 0 {
-		return 0, fmt.Errorf("Não é possivel dividir por zero")
+		return 0, errors.New("Não é possivel dividir por zero")
 	}
 
 	resultadoDivisao := float64(a)/float64(b)
 	return resultadoDivisao, nil
 }
 
-func dividirNumeros() {
+func dividirNumeros() error {
 
 	var a, b int
 
@@ -151,26 +182,46 @@ func dividirNumeros() {
 	fmt.Println("Digite o segundo número:")
 	fmt.Scanln(&b)
 	
+	if a < 0 || b < 0 {
+		return errors.New("Apenas números positivos são aceitos")
+	}
+
 	resultado, err := dividir(a, b)
 
 	if err != nil {
-		fmt.Println("Erro:", err)
-		return
+		return err
 	}
 
 	fmt.Println("Resultado da divisão: ", resultado)
 	
+	return nil
 }
 
-func limparLista() {
+func limparLista() error {
 
 	if len(numeros) == 0 {
-		fmt.Println("Lista já está vazia")
-		return
+		return errors.New("Lista está vazia")
 	}
 
 	numeros = []int{}
 	fmt.Println("Lista limpa")	
+
+	return nil
+}
+
+func listarNumerosPares() error {
+
+	if len(numeros) == 0 {
+		return errors.New("Lista está vazia")
+	}
+
+	for i := 0; i < len(numeros); i++ {
+		if numeros[i]%2 == 0 {
+			fmt.Println(numeros[i])
+		} 
+	}
+
+	return nil
 }
 
 
