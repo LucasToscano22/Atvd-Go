@@ -81,12 +81,29 @@ func listarNumeros() {
 	}
 
 	for i := 0; i < len(numeros); i++ {
-		fmt.Println(numeros[i])
+		fmt.Println("Indice: ", i, "Valor: ", numeros[i])
 	}
 }
 
 func removerNumero() {
+	
+	if len(numeros) == 0 {
+		fmt.Println("Lista está vazia")
+		return
+	}
 
+	fmt.Println("Digite um indice para remover o elemento da lista:")
+	var i int
+	fmt.Scanln(&i)
+
+	if i < 0  || i >= len(numeros) {
+		fmt.Println("Indice inválido")
+		return
+	}
+
+	numeros = append(numeros[:i], numeros[i+1:]...)
+
+	fmt.Println("Número removido da lista")
 }
 
 func calcularEstatisticas() (int, int, float64){
@@ -116,8 +133,33 @@ func calcularEstatisticas() (int, int, float64){
 
 }
 
+func dividir(a int, b int) (float64, error) {
+	if b == 0 {
+		return 0, fmt.Errorf("Não é possivel dividir por zero")
+	}
+
+	resultadoDivisao := float64(a)/float64(b)
+	return resultadoDivisao, nil
+}
+
 func dividirNumeros() {
 
+	var a, b int
+
+	fmt.Println("Digite o primeiro número:")
+	fmt.Scanln(&a)
+	fmt.Println("Digite o segundo número:")
+	fmt.Scanln(&b)
+	
+	resultado, err := dividir(a, b)
+
+	if err != nil {
+		fmt.Println("Erro:", err)
+		return
+	}
+
+	fmt.Println("Resultado da divisão: ", resultado)
+	
 }
 
 func limparLista() {
